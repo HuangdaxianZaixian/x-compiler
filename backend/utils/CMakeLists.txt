@@ -1,14 +1,8 @@
 file(GLOB_RECURSE _srcs 
-    IR/*.cpp
-    Transforms/*.cpp
-    Transforms/Patterns/*.cpp
-    Interfaces/*.cpp)
+    *.cpp)
 
-add_mlir_library(XCMLIRTOP
+add_mlir_library(XCUTILS
     ${_srcs}
-    DEPENDS
-    MLIRTopOpsIncGen
-    TopDialectPassesIncGen
 
     LINK_LIBS PUBLIC
     MLIRIR
@@ -19,5 +13,4 @@ add_mlir_library(XCMLIRTOP
     MLIRRewrite
     MLIRTransforms
     MLIRSideEffectInterfaces
-    XCUTILS
 )

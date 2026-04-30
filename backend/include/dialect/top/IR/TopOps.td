@@ -1,29 +1,26 @@
 #ifndef TOP_OPS__TD
 #define TOP_OPS__TD
 
-include "mlir/IR/OpBase.td"
-include "mlir/IR/AttrTypeBase.td"
-include "mlir/IR/EnumAttr.td"
-include "mlir/IR/SymbolInterfaces.td"
-include "mlir/Interfaces/SideEffectInterfaces.td"
-
-def Top_Dialect : Dialect {
-  let name = "top";
-  let cppNamespace = "::xc::top";
-
-  let summary = [{
-    top dialect
-  }];
-
-  let description = [{
-    top dialect is a high-level dialect
-  }];
-}
+include "TopDialect.td"
+include "TopAttrs.td"
+include "TopTraits.td"
+include "TopTypes.td"
 
 class Top_BaseOp<string mnemonic, list<Trait> traits = []> :
     Op<Top_Dialect, mnemonic, traits>;
 
-def Top_AddOp : Top_BaseOp<"add", [Pure]> {
+def Top_ConstantOp : Top_BaseOp<"constant"> {
+  let summary = "constant operation";
+  let description = [{
+    constant op
+  }];
+
+  let arguments = (ins);
+
+  let results = (outs AnyRankedTensor:$output);
+}
+
+def Top_AddOp : Top_BaseOp<"add", [NPUTrait]> {
   let summary = "add operation";
   let description = [{
     Add(a, b) = a + b
@@ -32,6 +29,22 @@ def Top_AddOp : Top_BaseOp<"add", [Pure]> {
   let arguments = (ins
     AnyRankedTensor:$lft,
     AnyRankedTensor:$rht
+  );
+
+  let results = (outs AnyRankedTensor:$output);
+
+  let hasVerifier = 1;
+}
+
+def Top_MatmulOp : Top_BaseOp<"matmul", [NPUTrait]> {
+  let summary = "matmul operation";
+  let description = [{
+    matmul(a, b) = a x b
+  }];
+
+  let arguments = (ins
+    AnyRankedTensor:$ifm,
+    AnyRankedTensor:$wgts
   );
 
   let results = (outs AnyRankedTensor:$output);

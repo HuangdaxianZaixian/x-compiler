@@ -13,7 +13,7 @@ public:
   mlir::LogicalResult matchAndRewrite(mlir::Operation *op,
                                 mlir::PatternRewriter &rewriter) const override;
 };
-} // namespace xrt
-} // namespace xp_mlir
+} // namespace top
+} // namespace xc
 
 #endif

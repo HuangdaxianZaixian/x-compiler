@@ -22,6 +22,62 @@
 #include <string>
 #include <vector>
 
+struct IncrementalPassTimingInstrumentation final : public mlir::PassInstrumentation {
+  struct ActivePass {
+    std::string passName;
+    std::string opName;
+    std::chrono::steady_clock::time_point startTime;
+  };
+
+  llvm::DenseMap<uint64_t, llvm::SmallVector<ActivePass, 4>> activePasses;
+  std::mutex outputMutex;
+
+  static std::string getPassDisplayName(mlir::Pass *pass) {
+    llvm::StringRef argument = pass->getArgument();
+    if (!argument.empty()) {
+      return argument.str();
+    }
+    return std::string(pass->getName());
+  }
+
+  void runBeforePass(mlir::Pass *pass, mlir::Operation *op) override {
+    activePasses[llvm::get_threadid()].push_back(
+        {getPassDisplayName(pass),
+         op ? op->getName().getStringRef().str() : std::string("<null-op>"),
+         std::chrono::steady_clock::now()});
+  }
+
+  void runAfterPass(mlir::Pass *pass, mlir::Operation *op) override {
+    printCompletedPassTiming(/*failed=*/false);
+  }
+
+  void runAfterPassFailed(mlir::Pass *pass, mlir::Operation *op) override {
+    printCompletedPassTiming(/*failed=*/true);
+  }
+
+  void printCompletedPassTiming(bool failed) {
+    auto &stack = activePasses[llvm::get_threadid()];
+    if (stack.empty()) {
+      return;
+    }
+
+    ActivePass activePass = std::move(stack.back());
+    stack.pop_back();
+
+    auto elapsedSeconds =
+        std::chrono::duration<double>(std::chrono::steady_clock::now() -
+                                      activePass.startTime)
+            .count();
+
+    std::lock_guard<std::mutex> lock(outputMutex);
+    llvm::errs() << "[mlir-timing] "
+                 << (failed ? "FAIL" : "PASS")
+                 << " pass='" << activePass.passName << "'"
+                 << " op='" << activePass.opName << "'"
+                 << " time_s=" << llvm::format("%.4f", elapsedSeconds) << "\n";
+  }
+};
+
 void registerAllDialects(mlir::DialectRegistry &registry) {
   registry.insert<mlir::func::FuncDialect,
                   xc::top::TopDialect>();
@@ -48,15 +104,20 @@ int main(int argc, char **argv) {
     std::string inputFilename, outputFilename;
     std::tie(inputFilename, outputFilename) = mlir::registerAndParseCLIOptions(
         args.size(), args.data(), "XP MLIR module optimizer driver\n", registry);
-  
+    
+    // 把全局注册的CLI选项快照进MlirOptMainConfig对象
+    // 真正构建pass pipeline发生mlir-opt内部调用config.setupPassPipeline(pm)时
     mlir::MlirOptMainConfig config = mlir::MlirOptMainConfig::createFromCLOptions();
-    auto basePipelineSetup =
-        [config](mlir::PassManager &pm) mutable { return config.setupPassPipeline(pm); };
+    auto basePipelineSetup = [config](mlir::PassManager &pm) mutable { return config.setupPassPipeline(pm); };
+    // 此处是定制setupPassPipeline函数的行为
+    // 比如下面在每个pass后面增加一个Instrumentation来统计每个pass的执行时间
     config.setPassPipelineSetupFn(
         [basePipelineSetup](mlir::PassManager &pm) mutable {
           if (llvm::failed(basePipelineSetup(pm))) {
             return mlir::failure();
           }
+          pm.addInstrumentation(
+            std::make_unique<IncrementalPassTimingInstrumentation>());
           return mlir::success();
         });
   

@@ -1,0 +1,20 @@
+# clangd 配置：告诉它去 build/ 下找 compile_commands.json
+CompileFlags:
+  CompilationDatabase: build
+  # MLIR / LLVM 使用 -fno-rtti，保持一致避免诊断噪音
+  Add:
+    - -fno-rtti
+    - -Wno-unused-parameter
+    - -Wno-unused-variable
+  Remove:
+    - -W*
+
+Diagnostics:
+  # TableGen 生成的 *.inc 中常有未使用符号，抑制以下噪音
+  Suppress:
+    - unused-includes
+  UnusedIncludes: None
+  MissingIncludes: None
+
+Index:
+  Background: Build

@@ -7,8 +7,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED YES)
 
 set(CMAKE_BUILD_TYPE Debug)
 
-set(LLVM_DIR /dataset-cpfs1/compiler/huangy43/repos/pro_mlir/third_party/llvm-install/lib/cmake/llvm)
-set(MLIR_DIR /dataset-cpfs1/compiler/huangy43/repos/pro_mlir/third_party/llvm-install/lib/cmake/mlir)
+# generate build/compile_commands.json for clangd
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+set(LLVM_DIR ${PROJECT_SOURCE_DIR}/third_party/llvm-project/build/lib/cmake/llvm)
+set(MLIR_DIR ${PROJECT_SOURCE_DIR}/third_party/llvm-project/build/lib/cmake/mlir)
 
 find_package(LLVM REQUIRED CONFIG)
 list(APPEND CMAKE_MODULE_PATH "${LLVM_CMAKE_DIR}")
@@ -26,12 +29,11 @@ include(HandleLLVMOptions)
 add_compile_options(-fno-rtti)
 
 include_directories("${PROJECT_SOURCE_DIR}")
+include_directories("${PROJECT_SOURCE_DIR}/backend")
 include_directories("${PROJECT_SOURCE_DIR}/backend/lib")
 include_directories("${PROJECT_SOURCE_DIR}/backend/include")
 include_directories("${CMAKE_BINARY_DIR}")
 include_directories("${CMAKE_BINARY_DIR}/backend/lib")
 include_directories("${CMAKE_BINARY_DIR}/backend/include")
 
-add_subdirectory(backend/include)
-add_subdirectory(backend/lib)
-add_subdirectory(backend/tools)
+add_subdirectory(backend)

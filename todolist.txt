@@ -1,0 +1,3 @@
+1. tensor encoding添加attrbutes
+2. shapeinfer interface 
+3. verify

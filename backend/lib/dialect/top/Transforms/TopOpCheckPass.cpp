@@ -9,6 +9,8 @@
 #include "dialect/top/Transforms/TopDialectPasses.hpp"
 #include "dialect/top/Transforms/Patterns/TopOpAttrConfig.hpp"
 
+#include "utils/com_utils.hpp"
+
 namespace xc {
 namespace top {
 
@@ -26,6 +28,7 @@ struct TopOpCheckPass : public top::TopOpCheckPassBase<TopOpCheckPass> {
         patterns.clear();
         patterns.add<TopOpAttrConfig>(ctx);
         (void)applyPatternsGreedily(mOp, std::move(patterns), config);
+        xc::utils::moduleDump(mOp, "top-op-check-pass.mlir", true);
     }
 };
 
