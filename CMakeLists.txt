@@ -20,6 +20,8 @@ find_package(MLIR REQUIRED CONFIG)
 list(APPEND CMAKE_MODULE_PATH "${MLIR_CMAKE_DIR}")
 include_directories(${LLVM_INCLUDE_DIRS} ${MLIR_INCLUDE_DIRS})
 
+message(STATUS "LLVM_DEBUG: ${LLVM_DEBUG}")
+
 
 include(TableGen)
 include(AddLLVM)

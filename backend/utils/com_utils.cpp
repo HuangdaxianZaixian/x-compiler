@@ -95,5 +95,37 @@ void moduleDump(const mlir::ModuleOp &module, const std::string &output_file_pat
     output->keep();
 }
 
+std::vector<int64_t> getTensorShape(mlir::Value val) {
+  assert(val && "invalid value!");
+  auto tensor_type = llvm::dyn_cast<mlir::RankedTensorType>(val.getType());
+  assert(tensor_type && "invalid tensor type!");
+
+  return tensor_type.getShape();
+}
+
+void setTensorType(mlir::Value val, const std::vector<int64_t>& shape, mlir::Type data_type, mlir::Attribute attr) {
+  auto rank_tensor = mlir::RankedTensorType::get(shape, data_type, attr);
+  val.setType(rank_tensor);
+}
+
+mlir::Type getTensorElementType(mlir::Value val) {
+  assert(val && "invalid value!");
+  auto tensor_type = llvm::dyn_cast<mlir::RankedTensorType>(val.getType());
+  assert(tensor_type && "invalid tensor type!");
+  return tensor_type.getElementType();
+}
+
+int64_t getTensorElementTypeBitWidth(mlir::Value val) {
+  auto elem_type = getTensorElementType(val);
+  assert(elem_type.isIntOrIndexOrFloat() && "invalid element type!");
+  return elem_type.getIntOrFloatBitWidth();
+}
+
+mlir::Attribute getTensorEncodingAttr(mlir::Value val) {
+  auto tensor_type = llvm::dyn_cast<mlir::RankedTensorType>(val.getType());
+  assert(tensor_type && "invalid tensor type!");
+  return tensor_type.getEncoding();
+}
+
 } // namespace utils
 } // namespace xc

@@ -18,6 +18,12 @@ void updateGraphInputType(const mlir::Value &val);
 void updateGraphOutputType(const mlir::Value &val);
 void moduleDump(const mlir::ModuleOp &module, const std::string &output_file_path, bool if_dump_large_data);
 
+std::vector<int64_t> getTensorShape(mlir::Value val);
+void setTensorType(mlir::Value val, const std::vector<int64_t>& shape, mlir::Type data_type, mlir::Attribute attr);
+mlir::Type getTensorElementType(mlir::Value val);
+int64_t getTensorElementTypeBitWidth(mlir::Value val);
+mlir::Attribute getTensorEncodingAttr(mlir::Value val);
+
 } // namespace utils
 } // namespace xc
 

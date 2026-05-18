@@ -1,3 +1,4 @@
-1. tensor encoding添加attrbutes
+1. interface 
+2. matmul左右操作数形状检查
 2. shapeinfer interface 
 3. verify

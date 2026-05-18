@@ -8,6 +8,7 @@
 #include "mlir/Support/LogicalResult.h"
 #include "mlir/Transforms/InliningUtils.h"
 #include "llvm/ADT/TypeSwitch.h"
+#include "llvm/Support/Debug.h"
 
 #include "mlir/IR/Operation.h"
 #include "mlir/IR/OpImplementation.h"
@@ -22,6 +23,8 @@
 
 #define GET_ATTRDEF_CLASSES
 #include "dialect/top/IR/TopAttrs.cpp.inc"
+
+#define DEBUG_TYPE "op-verify"
 
 namespace xc {
 namespace top {
@@ -42,12 +45,13 @@ void TopDialect::initialize() {
 }
 
 mlir::LogicalResult AddOp::verify() {
-  llvm::outs() << "AddOp verify" << "\n";
+  LLVM_DEBUG(llvm::dbgs() << "AddOp verify" << "\n");
   return mlir::success();
 }
 
 mlir::LogicalResult MatmulOp::verify() {
-  llvm::outs() << "MatmulOp verify" << "\n";
+  llvm::outs() << "llvm::DebugFlag = " << llvm::DebugFlag << "\n";
+  llvm::dbgs() << "MatmulOp verify" << "\n";
   return mlir::success();
 }
 
@@ -56,8 +60,11 @@ mlir::LogicalResult MatmulOp::verify() {
 }
 
 LogicalResult OpIndexType::verify(function_ref<InFlightDiagnostic()> emitError, int64_t id) {
-  if (id < 0) return emitError() << "id must be non-negative";
-  return success();
+  if (id < 0) {
+    emitError() << "id must be non-negative";
+    return mlir::failure();
+  }
+  return mlir::success();
 }
 
 } // namespace top

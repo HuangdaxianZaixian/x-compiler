@@ -5,6 +5,7 @@ include "TopDialect.td"
 include "TopAttrs.td"
 include "TopTraits.td"
 include "TopTypes.td"
+include "dialect/top/Interfaces/OpInterfaces.td"
 
 class Top_BaseOp<string mnemonic, list<Trait> traits = []> :
     Op<Top_Dialect, mnemonic, traits>;
@@ -20,7 +21,7 @@ def Top_ConstantOp : Top_BaseOp<"constant"> {
   let results = (outs AnyRankedTensor:$output);
 }
 
-def Top_AddOp : Top_BaseOp<"add", [NPUTrait]> {
+def Top_AddOp : Top_BaseOp<"add", [NPUTrait, DeclareOpInterfaceMethods<ShapeInferenceOpInterface>]> {
   let summary = "add operation";
   let description = [{
     Add(a, b) = a + b
@@ -36,7 +37,7 @@ def Top_AddOp : Top_BaseOp<"add", [NPUTrait]> {
   let hasVerifier = 1;
 }
 
-def Top_MatmulOp : Top_BaseOp<"matmul", [NPUTrait]> {
+def Top_MatmulOp : Top_BaseOp<"matmul", [NPUTrait, DeclareOpInterfaceMethods<ShapeInferenceOpInterface>]> {
   let summary = "matmul operation";
   let description = [{
     matmul(a, b) = a x b

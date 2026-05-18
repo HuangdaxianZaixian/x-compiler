@@ -15,6 +15,8 @@ using namespace mlir;
 
 #include "dialect/top/IR/TopDialect.h.inc"
 
+#include "dialect/top/Interfaces/TopInterfaces.h.inc"
+
 #define GET_TYPEDEF_CLASSES
 #include "dialect/top/IR/TopTypes.h.inc"
 
