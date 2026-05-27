@@ -1,3 +1,6 @@
+#include "mlir/Dialect/Linalg/IR/Linalg.h"
+#include "mlir/Dialect/Linalg/Passes.h"
+#include "mlir/Dialect/SCF/IR/SCF.h"
 #include "mlir/IR/DialectRegistry.h"
 #include "mlir/Pass/PassInstrumentation.h"
 #include "mlir/Pass/PassManager.h"
@@ -80,11 +83,16 @@ struct IncrementalPassTimingInstrumentation final : public mlir::PassInstrumenta
 
 void registerAllDialects(mlir::DialectRegistry &registry) {
   registry.insert<mlir::func::FuncDialect,
+                  mlir::tensor::TensorDialect,
+                  mlir::scf::SCFDialect,
+                  mlir::linalg::LinalgDialect,
                   xc::top::TopDialect>();
 }
 
 void registerAllPasses() {
   xc::top::registerTopPasses();
+  mlir::registerLinalgPasses();
+  
 }
 
 int main(int argc, char **argv) {

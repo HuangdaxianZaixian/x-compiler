@@ -6,6 +6,7 @@
 #include "mlir/Dialect/Arith/IR/Arith.h"
 #include "mlir/Pass/Pass.h"
 #include "dialect/top/IR/TopOps.hpp"
+#include "mlir/Dialect/SCF/IR/SCF.h"
 
 using namespace mlir;
 
@@ -13,6 +14,7 @@ namespace xc {
 namespace top {
 
 std::unique_ptr<mlir::OperationPass<mlir::ModuleOp>> createTopOpCheckPass();
+std::unique_ptr<mlir::OperationPass<mlir::ModuleOp>> createTopOpTilingPass();
 
 #define GEN_PASS_CLASSES
 #define GEN_PASS_REGISTRATION

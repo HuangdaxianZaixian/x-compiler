@@ -1,5 +1,6 @@
 #include "TopOpAttrConfig.hpp"
 #include "dialect/top/IR/TopTraits.hpp"
+#include "mlir/Interfaces/TilingInterface.h"
 #include "utils/com_utils.hpp"
 #include "dialect/top/IR/TopOps.hpp"
 #include "llvm/Support/raw_ostream.h"
@@ -25,6 +26,16 @@ mlir::LogicalResult TopOpAttrConfig::matchAndRewrite(mlir::Operation *op,
         llvm::outs() << "sharding trait found" << "\n";
       }
     }
+
+    if (llvm::isa<top::MatmulOp>(op)) {
+      auto tiling_interface = llvm::dyn_cast<TilingInterface>(op);
+      if (tiling_interface) {
+        llvm::outs() << "TilingInterface found for MatmulOp" << "\n";
+      } else {
+        llvm::outs() << "TilingInterface not found for MatmulOp" << "\n";
+      }
+    }
+
     return mlir::success();
   }
   

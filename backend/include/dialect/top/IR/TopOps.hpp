@@ -8,6 +8,7 @@
 #include "mlir/IR/Region.h"
 #include "mlir/Interfaces/SideEffectInterfaces.h"
 #include "llvm/ADT/ArrayRef.h"
+#include "mlir/Interfaces/TilingInterface.h"
 
 using namespace mlir;
 
