@@ -96,7 +96,7 @@ void registerAllPasses() {
   xc::top::registerTopPasses();
   mlir::registerLinalgPasses();
   mlir::registerLinalgTilingPass();
-  
+  mlir::registerLinalgTileAndFusePass();
 }
 
 int main(int argc, char **argv) {

@@ -2,6 +2,7 @@
 #define TILING_CONFIG_MANAGER_H
 
 #include "mlir/Dialect/Linalg/IR/Linalg.h"
+#include "mlir/IR/Operation.h"
 #include "llvm/ADT/DenseMap.h"
 #include <functional>
 
@@ -17,7 +18,7 @@ struct TilingSpec {
 /// 配置管理器 - 支持注册自定义配置函数
 class TilingConfigManager {
 public:
-  using ConfigFn = std::function<TilingSpec(linalg::LinalgOp)>;
+  using ConfigFn = std::function<TilingSpec(mlir::Operation*)>;
 
   static TilingConfigManager &getInstance() {
     static TilingConfigManager instance;
@@ -31,7 +32,7 @@ public:
   }
 
   /// 获取 op 的 tiling 配置
-  TilingSpec getConfig(linalg::LinalgOp op) {
+  TilingSpec getConfig(mlir::Operation* op) {
     auto it = configs.find(op->getName().getStringRef());
     if (it != configs.end()) {
       return it->second(op);
@@ -45,7 +46,7 @@ public:
   }
 
 private:
-  TilingSpec defaultConfig(linalg::LinalgOp op) {
+  TilingSpec defaultConfig(mlir::Operation* op) {
     if (defaultConfigFn) {
       return defaultConfigFn(op);
     }
@@ -57,6 +58,7 @@ private:
 };
 
 void registerLinalgTilingPass();
+void registerLinalgTileAndFusePass();
 
 } // namespace mlir
 
