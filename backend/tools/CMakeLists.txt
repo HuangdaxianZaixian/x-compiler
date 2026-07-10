@@ -7,6 +7,7 @@ set(LLVM_LINK_COMPONENTS
 set(LIBS
   MLIROptLib
   XCMLIRTOP
+  XCMLIRTILING
   ${dialect_libs}
   ${conversion_libs}
 )

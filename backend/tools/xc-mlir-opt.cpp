@@ -1,3 +1,4 @@
+#include "mlir/Dialect/Arith/IR/Arith.h"
 #include "mlir/Dialect/Linalg/IR/Linalg.h"
 #include "mlir/Dialect/Linalg/Passes.h"
 #include "mlir/Dialect/SCF/IR/SCF.h"
@@ -18,6 +19,7 @@
 #include "mlir/Dialect/Func/IR/FuncOps.h"
 #include "dialect/top/IR/TopOps.hpp"
 #include "dialect/top/Transforms/TopDialectPasses.hpp"
+#include "dialect/linalg/TilingConfigManager.hpp"
 
 #include <chrono>
 #include <iostream>
@@ -86,12 +88,14 @@ void registerAllDialects(mlir::DialectRegistry &registry) {
                   mlir::tensor::TensorDialect,
                   mlir::scf::SCFDialect,
                   mlir::linalg::LinalgDialect,
+                  mlir::arith::ArithDialect,
                   xc::top::TopDialect>();
 }
 
 void registerAllPasses() {
   xc::top::registerTopPasses();
   mlir::registerLinalgPasses();
+  mlir::registerLinalgTilingPass();
   
 }
 
